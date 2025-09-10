@@ -1,5 +1,12 @@
+/**
+ * Crea un nuevo grupo etario "50 A MAS AÑOS" en la hoja de antecedentes.
+ *
+ * Esta función agrega una nueva fila con el grupo etario "50 A MAS AÑOS" en la
+ * hoja de antecedentes de todos los establecimientos y configura la protección.
+ */
 function crearGrupoEtario50AMas() {
-    let establecimientos = obtenerListaEstablecimientos();
+    const ID_HOJA_ESTABLECIMIENTOS = "1_mdKkbKGyw4xjC6vgKt7JxMLQDph2IEvlhEpz2KHDgE";
+    let establecimientos = obtenerListaEstablecimientos(ID_HOJA_ESTABLECIMIENTOS);
 
     for (var i = 1; i < establecimientos.length; i++) {
         console.log(establecimientos[i][0]);

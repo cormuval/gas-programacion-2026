@@ -1,5 +1,12 @@
+/**
+ * Migra datos de programaciones del año 2024 a las programaciones 2025.
+ *
+ * Esta función procesa una lista de establecimientos para migración y transfiere
+ * datos de antecedentes, dotación y programación del año anterior.
+ */
 function migrarDatos() {
-    const establecimienetosMigracion = obtenerListaEstablecimientosMigracion();
+    const ID_HOJA_MIGRACION = "1_mdKkbKGyw4xjC6vgKt7JxMLQDph2IEvlhEpz2KHDgE";
+    const establecimienetosMigracion = obtenerListaEstablecimientos(ID_HOJA_MIGRACION, "Establecimientos Migracion");
 
     for (var i = 1; i < establecimienetosMigracion.length; i++) {
         if (establecimienetosMigracion[i][2] !== "No aplica") {
@@ -17,11 +24,8 @@ function migrarDatos() {
     }
 }
 
-function obtenerListaEstablecimientosMigracion() {
-    let establecimienetos = SpreadsheetApp.openById("1_mdKkbKGyw4xjC6vgKt7JxMLQDph2IEvlhEpz2KHDgE").getSheetByName("Establecimientos Migracion").getDataRange().getValues();
-    // console.log(establecimienetos[1][1]);
-    return establecimienetos;
-}
+// Esta función ahora se encuentra en utils/1 - Obtener establecimientos.js
+// Para usar: obtenerListaEstablecimientos(spreadsheetId, "Establecimientos Migracion")
 
 function migracionAntecedentes(origen, destino, poblacion) {
     console.log(poblacion);

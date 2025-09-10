@@ -1,25 +1,51 @@
+/**
+ * Crea programaciones para todos los establecimientos basándose en una plantilla.
+ *
+ * Esta función toma una plantilla de Google Sheets y crea una copia para cada
+ * establecimiento de la lista, guardándolas en una carpeta específica y registrando
+ * el enlace en la hoja de establecimientos.
+ */
 function crearProgramaciones() {
-    //ID de la version mas reciente de la plantilla (Se puede obtener ejecutando la funcion obtenerIdsDeArchivos)
-    let idPlantilla = "1Y0jq7BWO5DFO1EMXOeDb4QDvRAQMDRYrX6S6mGEXeYA";
-    // Obtener la plantilla desde Google Drive usando su ID
-    let plantilla = DriveApp.getFileById(idPlantilla);
-    // ID de la carpeta donde se guardaran los archivos creados
-    let carpetaDestino = DriveApp.getFolderById("17k4F8-48Dciwfwo87OybhUN_fU43Wxyf");
-    // Obtener la lista de establecimientos desde la hoja de cálculo
-    let establecimientos = obtenerListaEstablecimientos();
+    // IDs específicos para el proyecto 2026
+    const ID_PLANTILLA = "1Y0jq7BWO5DFO1EMXOeDb4QDvRAQMDRYrX6S6mGEXeYA";
+    const ID_CARPETA_DESTINO = "17k4F8-48Dciwfwo87OybhUN_fU43Wxyf";
+    const ID_HOJA_ESTABLECIMIENTOS = "1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU";
 
-    Logger.log(establecimientos.length);
+    // Obtener la plantilla desde Google Drive usando su ID
+    let plantilla = DriveApp.getFileById(ID_PLANTILLA);
+    let carpetaDestino = DriveApp.getFolderById(ID_CARPETA_DESTINO);
+    // Obtener la lista de establecimientos usando la función de utils
+    let establecimientos = obtenerListaEstablecimientos(ID_HOJA_ESTABLECIMIENTOS);
+
+    Logger.log(`Se procesarán ${establecimientos.length - 1} establecimientos`);
 
     for (var i = 1; i < establecimientos.length; i++) {
         let archivoNuevo = plantilla.makeCopy(establecimientos[i][0] + " - PROG APS 2026 v.1");
         let linkArchivoNuevo = archivoNuevo.getUrl();
         archivoNuevo.moveTo(carpetaDestino);
-        guardarLinkProgramacion(i + 1, linkArchivoNuevo);
+        guardarLinkProgramacion(ID_HOJA_ESTABLECIMIENTOS, i + 1, linkArchivoNuevo, 4);
         Logger.log("Archivo de " + establecimientos[i][0] + " ha sido Creado!");
     }
 }
 
-function guardarLinkProgramacion(posicion, link) {
-    let hoja = SpreadsheetApp.openById("1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU").getSheetByName("Establecimientos");
-    hoja.getRange(posicion, 4).setValue(link);
+/**
+ * Guarda el enlace de una programación en la hoja de establecimientos.
+ *
+ * Esta función actualiza una celda específica en la hoja de establecimientos
+ * con el enlace del archivo de programación creado.
+ *
+ * @param {string} spreadsheetId - El ID de la hoja de cálculo de establecimientos
+ * @param {number} fila - La fila donde guardar el enlace
+ * @param {string} link - El enlace del archivo de programación
+ * @param {number} columna - La columna donde guardar el enlace
+ */
+function guardarLinkProgramacion(spreadsheetId, fila, link, columna) {
+    try {
+        let hoja = SpreadsheetApp.openById(spreadsheetId).getSheetByName("Establecimientos");
+        hoja.getRange(fila, columna).setValue(link);
+        console.log(`Enlace guardado en fila ${fila}, columna ${columna}`);
+    } catch (error) {
+        console.error(`Error al guardar el enlace: ${error.message}`);
+        throw new Error(`No se pudo guardar el enlace: ${error.message}`);
+    }
 }

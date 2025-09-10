@@ -1,11 +1,15 @@
-function obtenerListaEstablecimientos() {
-    let establecimientos = SpreadsheetApp.openById("1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU").getSheetByName("Establecimientos").getDataRange().getValues();
-    console.log(establecimientos);
-    return establecimientos;
-}
+// Esta función ahora se encuentra en utils/1 - Obtener establecimientos.js
+// Para usar: obtenerListaEstablecimientos(spreadsheetId, sheetName)
 
+/**
+ * Arregla la fórmula del gráfico de funcionarios en la hoja GRAF_HRSFUN.
+ *
+ * Esta función actualiza la fórmula QUERY en la celda A1 de la hoja GRAF_HRSFUN
+ * para todos los establecimientos de HNC 2026.
+ */
 function arreglarFormulaGraficoFuncionarios() {
-    let establecimientos = obtenerListaEstablecimientos();
+    const ID_HOJA_ESTABLECIMIENTOS = "1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU";
+    let establecimientos = obtenerListaEstablecimientos(ID_HOJA_ESTABLECIMIENTOS);
 
     for (var i = 1; i < establecimientos.length; i++) {
         console.log(establecimientos[i][0]);
