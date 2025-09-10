@@ -1,12 +1,17 @@
 function crearProgramaciones() {
-    let plantilla = DriveApp.getFileById("1iDJrG3fYg23cvaPPZ1b2BQVdfddD0HMrLTq9dZjAQJU");
-    let carpetaDestino = DriveApp.getFolderById("1PuaxSbRWVsz6_eBsCCLldzd3gbhZ3TJn");
+    //ID de la version mas reciente de la plantilla (Se puede obtener ejecutando la funcion obtenerIdsDeArchivos)
+    let idPlantilla = "1Y0jq7BWO5DFO1EMXOeDb4QDvRAQMDRYrX6S6mGEXeYA";
+    // Obtener la plantilla desde Google Drive usando su ID
+    let plantilla = DriveApp.getFileById(idPlantilla);
+    // ID de la carpeta donde se guardaran los archivos creados
+    let carpetaDestino = DriveApp.getFolderById("17k4F8-48Dciwfwo87OybhUN_fU43Wxyf");
+    // Obtener la lista de establecimientos desde la hoja de cálculo
     let establecimientos = obtenerListaEstablecimientos();
 
     Logger.log(establecimientos.length);
 
     for (var i = 1; i < establecimientos.length; i++) {
-        let archivoNuevo = plantilla.makeCopy(establecimientos[i][0] + " - PROG APS 2025 v.1");
+        let archivoNuevo = plantilla.makeCopy(establecimientos[i][0] + " - PROG APS 2026 v.1");
         let linkArchivoNuevo = archivoNuevo.getUrl();
         archivoNuevo.moveTo(carpetaDestino);
         guardarLinkProgramacion(i + 1, linkArchivoNuevo);
@@ -15,11 +20,12 @@ function crearProgramaciones() {
 }
 
 function obtenerListaEstablecimientos() {
-    let establecimienetos = SpreadsheetApp.openById("1_mdKkbKGyw4xjC6vgKt7JxMLQDph2IEvlhEpz2KHDgE").getSheetByName("Establecimientos").getDataRange().getValues();
-    return establecimienetos;
+    let establecimientos = SpreadsheetApp.openById("1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU").getSheetByName("Establecimientos").getDataRange().getValues();
+    console.log(establecimientos);
+    return establecimientos;
 }
 
 function guardarLinkProgramacion(posicion, link) {
-    let hoja = SpreadsheetApp.openById("1_mdKkbKGyw4xjC6vgKt7JxMLQDph2IEvlhEpz2KHDgE").getSheetByName("Establecimientos");
+    let hoja = SpreadsheetApp.openById("1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU").getSheetByName("Establecimientos");
     hoja.getRange(posicion, 2).setValue(link);
 }
