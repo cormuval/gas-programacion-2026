@@ -7,6 +7,7 @@
  * @returns {Array<{id: string, nombre: string}>} Un arreglo de objetos, cada uno conteniendo el ID y el nombre de un archivo.
  */
 function obtenerIdsDeArchivos() {
+    // Recordar cambiar el ID de la carpeta por el ID de la carpeta deseada
     let carpeta = DriveApp.getFolderById("13pD9PeY7_WWNPeLshv251MlhTFENCZjf");
     let archivos = carpeta.getFiles();
     let infoArchivos = [];
