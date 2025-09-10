@@ -27,5 +27,5 @@ function obtenerListaEstablecimientos() {
 
 function guardarLinkProgramacion(posicion, link) {
     let hoja = SpreadsheetApp.openById("1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU").getSheetByName("Establecimientos");
-    hoja.getRange(posicion, 2).setValue(link);
+    hoja.getRange(posicion, 4).setValue(link);
 }
