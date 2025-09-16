@@ -129,7 +129,7 @@ function establecerValorMasivo(urlsArchivos, nombreHoja, celda, valor) {
  * @param {string} spreadsheetId - El ID del archivo de Google Sheets
  * @returns {Object} Un objeto con la información del archivo
  */
-function obtenerInfoArchivo(spreadsheetId) {
+function obtenerInfoSheet(spreadsheetId) {
     try {
         let archivo = SpreadsheetApp.openById(spreadsheetId);
         let hojas = archivo.getSheets();
