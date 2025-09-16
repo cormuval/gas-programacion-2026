@@ -4,7 +4,7 @@ Este documento describe las funciones utilitarias disponibles en la carpeta `uti
 
 ## Estructura de Utils
 
-### 1. Obtener establecimientos.js
+### 1 - Obtener establecimientos.js
 
 **Función principal:** `obtenerListaEstablecimientos(spreadsheetId, sheetName)`
 
@@ -26,29 +26,16 @@ let establecimientos = obtenerListaEstablecimientos(ID_HOJA_ESTABLECIMIENTOS);
 let establecimientosMigracion = obtenerListaEstablecimientos(ID_HOJA_ESTABLECIMIENTOS, "Establecimientos Migracion");
 ```
 
-### 2. Controlar acceso.js
+### 2 - Habilitar acceso para visualizar.js
 
-**Funciones disponibles:**
+**Función principal:** `habilitarAccesoVisualizar(folderId, excludeFiles)`
 
-#### `habilitarAccesoVisualizar(folderId, excludeFiles)`
+**Propósito:** Configura archivos para acceso de solo lectura en una carpeta de Google Drive.
 
--   **Propósito:** Configura archivos para acceso de solo lectura
--   **Parámetros:**
-    -   `folderId` (string): ID de la carpeta de Google Drive
-    -   `excludeFiles` (array, opcional): Nombres de archivos a excluir
+**Parámetros:**
 
-#### `habilitarAccesoEditar(folderId, excludeFiles)`
-
--   **Propósito:** Configura archivos para acceso de edición
--   **Parámetros:** Igual que la función anterior
-
-#### `eliminarEditoresDeArchivo(spreadsheetId)`
-
--   **Propósito:** Elimina todos los editores excepto el propietario de un archivo específico
-
-#### `eliminarEditoresDeEstablecimientos(spreadsheetId, sheetName, urlColumnIndex)`
-
--   **Propósito:** Elimina editores de múltiples archivos basándose en una lista de establecimientos
+-   `folderId` (string): ID de la carpeta de Google Drive
+-   `excludeFiles` (array, opcional): Nombres de archivos a excluir
 
 **Ejemplo de uso:**
 
@@ -59,13 +46,69 @@ habilitarAccesoVisualizar(CARPETA_ID);
 
 // Excluir archivos específicos
 habilitarAccesoVisualizar(CARPETA_ID, ["CECOSF LAGUNA VERDE"]);
+```
 
+### 3 - Habilitar acceso para editar.js
+
+**Función principal:** `habilitarAccesoEditar(folderId, excludeFiles)`
+
+**Propósito:** Configura archivos para acceso de edición en una carpeta de Google Drive.
+
+**Parámetros:**
+
+-   `folderId` (string): ID de la carpeta de Google Drive
+-   `excludeFiles` (array, opcional): Nombres de archivos a excluir
+
+**Ejemplo de uso:**
+
+```javascript
+// Habilitar acceso de edición a una carpeta
+const CARPETA_ID = "1PuaxSbRWVsz6_eBsCCLldzd3gbhZ3TJn";
+habilitarAccesoEditar(CARPETA_ID);
+
+// Excluir archivos específicos
+habilitarAccesoEditar(CARPETA_ID, ["CECOSF LAGUNA VERDE"]);
+```
+
+### 4 - Eliminar editores.js
+
+**Función principal:** `eliminarEditoresDeArchivo(spreadsheetId)`
+
+**Propósito:** Elimina todos los editores excepto el propietario de un archivo específico.
+
+**Parámetros:**
+
+-   `spreadsheetId` (string): ID del archivo de Google Sheets
+
+**Ejemplo de uso:**
+
+```javascript
+// Eliminar editores de un archivo específico
+const ID_HOJA = "1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU";
+eliminarEditoresDeArchivo(ID_HOJA);
+```
+
+### 5 - Eliminar editores multiples archivos.js
+
+**Función principal:** `eliminarEditoresDeEstablecimientos(spreadsheetId, sheetName, urlColumnIndex)`
+
+**Propósito:** Elimina editores de múltiples archivos basándose en una lista de establecimientos.
+
+**Parámetros:**
+
+-   `spreadsheetId` (string): ID de la hoja de cálculo que contiene la lista de establecimientos
+-   `sheetName` (string): Nombre de la hoja
+-   `urlColumnIndex` (number): Índice de la columna que contiene las URLs de los archivos
+
+**Ejemplo de uso:**
+
+```javascript
 // Eliminar editores de establecimientos
 const ID_HOJA = "1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU";
 eliminarEditoresDeEstablecimientos(ID_HOJA, "Establecimientos", 2);
 ```
 
-### 3. Obtener ids de archivos.js
+### 6 - Obtener informacion de archivos.js
 
 **Funciones disponibles:**
 
@@ -98,7 +141,7 @@ let hojas = obtenerIdsDeArchivos(CARPETA_ID, "application/vnd.google-apps.spread
 let archivosBuscados = buscarArchivosPorNombre(CARPETA_ID, "PROG APS", false);
 ```
 
-### 4. Operaciones hojas.js
+### 7 - Operaciones en Sheet.js
 
 **Funciones disponibles:**
 
