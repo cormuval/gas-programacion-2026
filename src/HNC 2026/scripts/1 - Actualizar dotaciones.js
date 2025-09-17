@@ -67,10 +67,10 @@ function migrarInformacionDotacion(origen, destino) {
     destino.getSheetByName("DOTACION").getRange("S3:S195").setValues(datosOrigen);
 
     //*COLUMNA CALIDAD (Se usa solo en la primera ejecución para llenar la columna con "DOTACION")
-    let dotacionArray = Array(193)
-        .fill()
-        .map(() => ["DOTACION"]);
-    destino.getSheetByName("DOTACION").getRange("D3:D195").setValues(dotacionArray);
+    // let dotacionArray = Array(193)
+    //     .fill()
+    //     .map(() => ["DOTACION"]);
+    // destino.getSheetByName("DOTACION").getRange("D3:D195").setValues(dotacionArray);
 }
 
 function traduccionEstamentos() {
