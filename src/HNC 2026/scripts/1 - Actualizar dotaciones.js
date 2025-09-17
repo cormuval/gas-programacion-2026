@@ -13,6 +13,50 @@ function migrarDotaciones() {
 
 function migrarInformacionDotacion(origen, destino) {
     let datosOrigen;
+    //Columna estamento
     datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("B7:B199").getValues();
+    // Obtener el mapeo de traducción
+    let traduccion = traduccionEstamentos();
+    // Traducir los valores
+    for (let i = 0; i < datosOrigen.length; i++) {
+        let estamentoOriginal = datosOrigen[i][0];
+        if (traduccion[estamentoOriginal]) {
+            datosOrigen[i][0] = traduccion[estamentoOriginal];
+        }
+        // Si no está en el mapeo, dejar el valor original
+    }
     destino.getSheetByName("DOTACION").getRange("A3:A195").setValues(datosOrigen);
+}
+
+function traduccionEstamentos() {
+    let traduccion = {
+        "CIRUJANO DENTISTA": "ODONTOLOGO/A",
+        "MEDICO CIRUJANO": "MEDICO",
+        "QUIMICO FARMACEUTICO": "QUIMICO FARMACEUTICO",
+        "ACOMPAÑAMIENTO PSICOSOCIAL": "PSICOLOGO/A",
+        "EDUCADORA DE PARVULOS": "EDUCADORA DE PARVULOS",
+        "ENFERMERA(O)": "ENFERMERA/O",
+        FONOAUDIOLOGA: "FONOAUDIOLOGO/A",
+        "KINESIOLOGA/O": "KINESIOLOGA/O",
+        "MATRON/A": "MATRON/A",
+        NUTRICIONISTA: "NUTRICIONISTA",
+        "PSICOLOGA/O": "PSICOLOGO/A",
+        "TRABAJADOR/A SOCIAL": "TRABAJADOR/A SOCIAL",
+        PODOLOGA: "PODOLOGO/A",
+        TENS: "TECNICO EN ENFERMERIA",
+        TONS: "TONS (HIGIENISTA DENTAL)",
+        "TENS FARMACIA": "TENS FARMACIA",
+        "TERAPEUTA OCUPACIONAL": "TERAPEUTA OCUPACIONAL",
+        "AGENTE DE MEDICINA INDIGENA": "AGENTE DE MEDICINA INDIGENA",
+        "FACILITADOR/A INTERCULTURAL": "FACILITADOR/A INTERCULTURAL",
+        "GESTOR COMUNITARIO": "GESTOR COMUNITARIO",
+        "MEDICO OFTALMOLOGIA": "MEDICO OFTALMOLOGIA",
+        "MEDICO OTORRINOLARINGOLOGIA": "MEDICO OTORRINOLARINGOLOGIA",
+        "PROFESIONAL DE ACTIVIDAD FÍSICA": "PROFESIONAL DE ACTIVIDAD FÍSICA",
+        "TECNOLOGO MEDICO": "TECNOLOGO MEDICO",
+        "TENS PPAA": "TENS PPAA",
+        "TECNICO EN TRABAJO SOCIAL": "TECNICO EN TRABAJO SOCIAL",
+        "TONS (HIGIENISTA DENTAL)": "TONS (HIGIENISTA DENTAL)",
+    };
+    return traduccion;
 }
