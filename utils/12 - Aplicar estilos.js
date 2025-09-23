@@ -50,3 +50,23 @@ function aplicarEstilos(spreadsheetId, sheetName, range, opciones = {}) {
         rango.setFontWeight("normal");
     }
 }
+
+/**
+ * Función de ejemplo que demuestra cómo usar aplicarEstilos.
+ * Esta función aplica bordes, color de fondo amarillo y negrita a un rango específico.
+ * Reemplaza el spreadsheetId con un ID real de tu Google Spreadsheet para probar.
+ */
+function ejemploAplicarEstilos() {
+    const spreadsheetId = "TU_SPREADSHEET_ID_AQUI"; // Reemplaza con el ID real de tu spreadsheet
+    const sheetName = "Hoja1"; // Nombre de la hoja
+    const range = "A1:B10"; // Rango de ejemplo
+    const opciones = {
+        borders: true, // Aplicar bordes
+        backgroundColor: "#FFFF00", // Color de fondo amarillo
+        bold: true, // Aplicar negrita
+    };
+
+    // Llamar a la función aplicarEstilos con los parámetros de ejemplo
+    aplicarEstilos(spreadsheetId, sheetName, range, opciones);
+    Logger.log("Estilos aplicados exitosamente en el ejemplo.");
+}
