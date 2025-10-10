@@ -16,9 +16,9 @@ function actualizarReunionesHNC2026(nuevosNombres) {
 function MigrarValoresHNC(origen, destino) {
     let datosOrigen;
     //Parte 1
-    datosOrigen = origen.getSheetByName("BD_REF_GESTION").getRange("A2:G215").getValues();
+    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("K2:M175").getValues();
     //console.log(datosOrigen);
-    destino.getSheetByName("BD_REF_GESTION").getRange("A2:G215").setValues(datosOrigen);
+    destino.getSheetByName("BD_REF_REUNIONES").getRange("K2:M175").setValues(datosOrigen);
 
     //Parte 2
     // datosOrigen = origen.getSheetByName("BD_REF_GESTION").getRange("F2:M175").getValues();
