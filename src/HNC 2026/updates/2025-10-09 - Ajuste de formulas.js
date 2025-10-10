@@ -28,47 +28,59 @@ function replicarFormulaHncTipo20251010() {
 
     for (var i = 1; i < establecimientos.length; i++) {
         console.log(`Modificando el establecimiento: ${establecimientos[i][0]}`);
-        const URL_SHEET = establecimientos[i][5];
-        const HOJA = "HNCxTIPO";
-        const FILA_INICIO = 62;
-        const FILA_FIN = 300;
-        const COLUMNA = "";
-        const FORMULA_BASE = "";
+        let urlSheet = establecimientos[i][5];
+        let hoja = "HNCxTIPO";
+        let filaInicio = 62;
+        let filaFin = 300;
+        let columna = "";
+        let formulaBase = "";
 
-        //COLUMNA GESTION
-        COLUMNA = "E";
-        FORMULA_BASE = `=SI.ERROR(INDICE(QUERY(ENCUESTA_GESTION!$A$3:$H;"SELECT sum(H) WHERE B='"&$D{row}&"'   ";0);2);"")`;
+        //COLUMNA GESTIÓN
+        columna = "E";
+        formulaBase = `=IFERROR(INDEX(QUERY(ENCUESTA_GESTION!$A$3:$H;"SELECT sum(H) WHERE B='"&$D{row}&"'   ";0);2);"")`;
         replicarFormulaEnRango(
-            URL_SHEET, // urlSheet
-            HOJA, // nombreHoja
-            FILA_INICIO, // filaInicio
-            FILA_FIN, // filaFin
-            COLUMNA, // columna
-            FORMULA_BASE // formulaBase
+            urlSheet, // urlSheet
+            hoja, // nombreHoja
+            filaInicio, // filaInicio
+            filaFin, // filaFin
+            columna, // columna
+            formulaBase // formulaBase
         );
 
         //COLUMNA REUNIONES
-        COLUMNA = "F";
-        FORMULA_BASE = `=SI.ERROR(INDICE(QUERY(ENCUESTA_REU!$A$3:$H;"SELECT sum(H) WHERE B='"&$D{row}&"'   ";0);2);"")`;
+        columna = "F";
+        formulaBase = `=IFERROR(INDEX(QUERY(ENCUESTA_REU!$A$3:$H;"SELECT sum(H) WHERE B='"&$D{row}&"'   ";0);2);"")`;
         replicarFormulaEnRango(
-            URL_SHEET, // urlSheet
-            HOJA, // nombreHoja
-            FILA_INICIO, // filaInicio
-            FILA_FIN, // filaFin
-            COLUMNA, // columna
-            FORMULA_BASE // formulaBase
+            urlSheet, // urlSheet
+            hoja, // nombreHoja
+            filaInicio, // filaInicio
+            filaFin, // filaFin
+            columna, // columna
+            formulaBase // formulaBase
         );
 
         //COLUMNA DERECHOS FUNCIONARIOS
-        COLUMNA = "G";
-        FORMULA_BASE = `=SI.ERROR(INDICE(QUERY(ENCUESTA_DER!$A$3:$H;"SELECT sum(H) WHERE B='"&$D{row}&"'   ";0);2);"")`;
+        columna = "G";
+        formulaBase = `=IFERROR(INDEX(QUERY(ENCUESTA_DER!$A$3:$H;"SELECT sum(H) WHERE B='"&$D{row}&"'   ";0);2);"")`;
         replicarFormulaEnRango(
-            URL_SHEET, // urlSheet
-            HOJA, // nombreHoja
-            FILA_INICIO, // filaInicio
-            FILA_FIN, // filaFin
-            COLUMNA, // columna
-            FORMULA_BASE // formulaBase
+            urlSheet, // urlSheet
+            hoja, // nombreHoja
+            filaInicio, // filaInicio
+            filaFin, // filaFin
+            columna, // columna
+            formulaBase // formulaBase
+        );
+
+        //COLUMNA TOTAL HNC
+        columna = "H";
+        formulaBase = `=SUM(E{row}:G{row})`;
+        replicarFormulaEnRango(
+            urlSheet, // urlSheet
+            hoja, // nombreHoja
+            filaInicio, // filaInicio
+            filaFin, // filaFin
+            columna, // columna
+            formulaBase // formulaBase
         );
 
         console.log(`Modificación realizada correctamente en el establecimiento: ${establecimientos[i][0]}`);
