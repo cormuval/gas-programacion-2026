@@ -15,25 +15,28 @@ function actualizarBdRefHNC2026() {
 
 function MigrarValoresHNC(origen, destino) {
     let datosOrigen;
+    //ACTUALIZACION DE BD DE REUBIONES
     //Parte 1
-    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("A2:D234").getValues();
+    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("A2:D235").getValues();
     //console.log(datosOrigen);
-    destino.getSheetByName("BD_REF_REUNIONES").getRange("A2:D234").setValues(datosOrigen);
+    destino.getSheetByName("BD_REF_REUNIONES").getRange("A2:D235").setValues(datosOrigen);
 
     //Parte 1.2
-    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("F2:M234").getValues();
+    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("F2:M235").getValues();
     //console.log(datosOrigen);
-    destino.getSheetByName("BD_REF_REUNIONES").getRange("F2:M234").setValues(datosOrigen);
+    destino.getSheetByName("BD_REF_REUNIONES").getRange("F2:M235").setValues(datosOrigen);
 
+    //ACTUALIZACION DE BD DE DERECHOS FUNCIONARIOS
     //Parte 2
     datosOrigen = origen.getSheetByName("BD_REF_DERECHOS").getRange("A2:F41").getValues();
     //console.log(datosOrigen);
     destino.getSheetByName("BD_REF_DERECHOS").getRange("A2:F41").setValues(datosOrigen);
     //console.log(datosOrigen);
 
+    //ACTUALIZACION DE BD DE CARGOS DE GESTION
     //Parte 3
-    datosOrigen = origen.getSheetByName("BD_REF_GESTION").getRange("A2:G308").getValues();
+    datosOrigen = origen.getSheetByName("BD_REF_GESTION").getRange("A2:G328").getValues();
     //console.log(datosOrigen);
-    destino.getSheetByName("BD_REF_GESTION").getRange("A2:G308").setValues(datosOrigen);
+    destino.getSheetByName("BD_REF_GESTION").getRange("A2:G328").setValues(datosOrigen);
     //console.log(datosOrigen);
 }
