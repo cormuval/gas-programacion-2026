@@ -16,12 +16,24 @@ function actualizarReunionesHNC2026(nuevosNombres) {
 function MigrarValoresHNC(origen, destino) {
     let datosOrigen;
     //Parte 1
-    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("K2:M175").getValues();
+    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("A2:D234").getValues();
     //console.log(datosOrigen);
-    destino.getSheetByName("BD_REF_REUNIONES").getRange("K2:M175").setValues(datosOrigen);
+    destino.getSheetByName("BD_REF_REUNIONES").getRange("A2:D234").setValues(datosOrigen);
+
+     //Parte 1.2
+    datosOrigen = origen.getSheetByName("BD_REF_REUNIONES").getRange("F2:M234").getValues();
+    //console.log(datosOrigen);
+    destino.getSheetByName("BD_REF_REUNIONES").getRange("F2:M234").setValues(datosOrigen);
 
     //Parte 2
-    // datosOrigen = origen.getSheetByName("BD_REF_GESTION").getRange("F2:M175").getValues();
+    datosOrigen = origen.getSheetByName("BD_REF_DERECHOS").getRange("A2:F41").getValues();
     //console.log(datosOrigen);
-    // destino.getSheetByName("BD_REF_REUNIONES").getRange("F2:M175").setValues(datosOrigen);
+    destino.getSheetByName("BD_REF_DERECHOS").getRange("A2:F41").setValues(datosOrigen);
+    //console.log(datosOrigen);
+
+    //Parte 3
+    datosOrigen = origen.getSheetByName("BD_REF_GESTION").getRange("A2:G308").getValues();
+    //console.log(datosOrigen);
+    destino.getSheetByName("BD_REF_GESTION").getRange("A2:G308").setValues(datosOrigen);
+    //console.log(datosOrigen);
 }
