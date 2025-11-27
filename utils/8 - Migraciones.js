@@ -127,23 +127,6 @@ function migrarFormulasEspecificas(origen, destino) {
 }
 
 /**
- * Copia fórmulas de un rango específico a otro.
- *
- * @param {Spreadsheet} origen - El archivo de origen
- * @param {Spreadsheet} destino - El archivo de destino
- * @param {string} nombreHojaOrigen - Nombre de la hoja de origen
- * @param {string} rangoOrigen - Rango de origen
- * @param {string} rangoDestino - Rango de destino
- */
-function copiarFormulasRango(origen, destino, nombreHojaOrigen, rangoOrigen, rangoDestino) {
-    // Obtener las fórmulas del rango de origen
-    var formulas = origen.getSheetByName("HORAS A PROGRAMAR").getRange("L4:U32").getFormulas();
-
-    // Establecer las fórmulas en el rango de destino
-    destino.getSheetByName("HORAS A PROGRAMAR").getRange("L4:U32").setFormulas(formulas);
-}
-
-/**
  * Migra valores desde un origen a múltiples destinos.
  */
 function migrarValores() {
