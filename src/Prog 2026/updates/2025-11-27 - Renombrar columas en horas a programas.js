@@ -1,4 +1,4 @@
-function renombrarColumnasHorasAProgramar() {
+function renombrarColumnasHorasAProgramar20251127() {
     const hoja = "HORAS A PROGRAMAR"; // Reemplaza con el nombre de tu hoja
     let celda;
     let valor;
