@@ -11,12 +11,16 @@ function actualizarFormula80AmasAnos20251128() {
     let celda;
     let formula;
 
+    //LIMPIAR RANGO POBLACIÓN SIMPLE HOMBRES Y MUJERES 80 A MAS AÑOS
+    limpiarRangoEnBdProg("PoblaSimpleHom", "A74:DV76");
+    limpiarRangoEnBdProg("PoblaSimpleMuj", "A74:DV76");
+
     //HOMBRES 80 A MAS AÑOS
     celda = "I40";
-    formula = `=SUM(PoblaSimpleHom!$CG$10:$DU$10)`;
+    formula = `=SUMPRODUCT((PoblaSimpleHom!$B$9:$B$90=$C$3)*(PoblaSimpleHom!$CG$9:$DU$90))`;
     actualizarFormulaEnProg2026(hoja, celda, formula);
     //MUJERES 80 A MAS AÑOS
     celda = "J40";
-    formula = `=SUM(PoblaSimpleMuj!$CG$10:$DU$10)`;
+    formula = `=SUMPRODUCT((PoblaSimpleMuj!$B$9:$B$90=$C$3)*(PoblaSimpleMuj!$CG$9:$DU$90))`;
     actualizarFormulaEnProg2026(hoja, celda, formula);
 }
