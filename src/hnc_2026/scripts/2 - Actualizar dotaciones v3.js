@@ -1,4 +1,4 @@
-function migrarDotaciones() {
+function migrarDotacionesV3() {
     // 1. Constantes del consolidado de origen
     const ID_ORIGEN_CONSOLIDADOR = "1Yc4t7SmTrXuffMsnr5le1a_V7uoBKmVMnw4WWgzv3Cs";
     const NOMBRE_HOJA_ORIGEN = "CONSO_HNC_HC";
@@ -27,7 +27,7 @@ function migrarDotaciones() {
     for (let i = 1; i < establecimientos.length; i++) {
         let nombreEstablecimiento = establecimientos[i][0];
         let programacionUrl = establecimientos[i][3]; // URL del sheet de destino (programacion)
-        
+
         if (!programacionUrl) {
             console.warn("El establecimiento " + nombreEstablecimiento + " no tiene configurada una URL de destino.");
             continue;
@@ -50,7 +50,7 @@ function migrarInformacionDotacionConsolidada(nombreEstablecimiento, dataRows, d
     }
 
     // 1. Filtrar registros del consolidado correspondientes a este centro
-    let rowsFiltradas = dataRows.filter(row => {
+    let rowsFiltradas = dataRows.filter((row) => {
         let estValue = row[2]; // Columna ESTABLECIMIENTO (índice 2)
         return estValue && estValue.toString().trim().toUpperCase() === nombreEstablecimiento.toString().trim().toUpperCase();
     });
@@ -79,18 +79,18 @@ function migrarInformacionDotacionConsolidada(nombreEstablecimiento, dataRows, d
 
         // Bloque A-G: ESTAMENTO, CARGO, CAT, CALIDAD, NOMBRE FUNCIONARIO/A, HORAS FUNC, DIAS PROGRAMACION
         datosA_G.push([
-            cargoTraducido,           // ESTAMENTO (Col A)
-            cargoTraducido,           // CARGO (Col B)
-            sourceRow[3],             // CAT (Col C - CATEGORIA)
-            "DOTACION",               // CALIDAD (Col D - Valor Fijo)
-            sourceRow[6],             // NOMBRE FUNCIONARIO/A (Col E - FUNCIONARIO)
-            sourceRow[5],             // HORAS FUNC (Col F - JORNADA)
-            248                       // DIAS PROGRAMACION (Col G - Valor Fijo)
+            cargoTraducido, // ESTAMENTO (Col A)
+            cargoTraducido, // CARGO (Col B)
+            sourceRow[3], // CAT (Col C - CATEGORIA)
+            "DOTACION", // CALIDAD (Col D - Valor Fijo)
+            sourceRow[6], // NOMBRE FUNCIONARIO/A (Col E - FUNCIONARIO)
+            sourceRow[5], // HORAS FUNC (Col F - JORNADA)
+            248, // DIAS PROGRAMACION (Col G - Valor Fijo)
         ]);
 
         // Bloque V: TOTAL HORAS CLINICAS AL AÑO
         datosV.push([
-            sourceRow[16]             // TOTAL HORAS CLINICAS AL AÑO (Col V - HORAS CLINICAS año)
+            sourceRow[16], // TOTAL HORAS CLINICAS AL AÑO (Col V - HORAS CLINICAS año)
         ]);
     }
 
@@ -136,14 +136,14 @@ function traduccionEstamentos() {
 function validarConsolidadoHNC() {
     const ID_ORIGEN_CONSOLIDADOR = "1Yc4t7SmTrXuffMsnr5le1a_V7uoBKmVMnw4WWgzv3Cs";
     const NOMBRE_HOJA_ORIGEN = "CONSO_HNC_HC";
-    
+
     let origenSpreadsheet = SpreadsheetApp.openById(ID_ORIGEN_CONSOLIDADOR);
     let origenSheet = origenSpreadsheet.getSheetByName(NOMBRE_HOJA_ORIGEN);
     if (!origenSheet) {
         console.error("No se pudo encontrar la hoja " + NOMBRE_HOJA_ORIGEN);
         return;
     }
-    
+
     let allData = origenSheet.getDataRange().getValues();
     let dataRows = allData.slice(4);
     console.log("--- PRUEBA EN SECO CONSOLIDADO HNC ---");
@@ -151,16 +151,16 @@ function validarConsolidadoHNC() {
 
     // Probar con un establecimiento muestra
     const centrosMuestra = ["CECOSF CERRO ALEGRE", "CECOSF ISLA NEGRA"];
-    
-    centrosMuestra.forEach(centro => {
-        let rowsFiltradas = dataRows.filter(row => {
+
+    centrosMuestra.forEach((centro) => {
+        let rowsFiltradas = dataRows.filter((row) => {
             let estValue = row[2];
             return estValue && estValue.toString().trim().toUpperCase() === centro.toString().trim().toUpperCase();
         });
-        
+
         console.log("\nEstablecimiento: " + centro);
         console.log("Registros encontrados: " + rowsFiltradas.length);
-        
+
         if (rowsFiltradas.length > 0) {
             console.log("Primer registro de muestra:");
             let r = rowsFiltradas[0];
