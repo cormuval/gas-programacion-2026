@@ -1,76 +1,103 @@
 function migrarDotaciones() {
+    // 1. Constantes del consolidado de origen
+    const ID_ORIGEN_CONSOLIDADOR = "1Yc4t7SmTrXuffMsnr5le1a_V7uoBKmVMnw4WWgzv3Cs";
+    const NOMBRE_HOJA_ORIGEN = "CONSO_HNC_HC";
     const ID_HOJA_ESTABLECIMIENTOS = "1xVWBfmaSKHajoiw95Vg9Z1KJevPRm_-Ll4XIrYc3cmU";
+
+    // 2. Extraer datos del consolidado de origen (una sola vez)
+    let origenSpreadsheet = SpreadsheetApp.openById(ID_ORIGEN_CONSOLIDADOR);
+    let origenSheet = origenSpreadsheet.getSheetByName(NOMBRE_HOJA_ORIGEN);
+    if (!origenSheet) {
+        throw new Error("No se pudo encontrar la hoja " + NOMBRE_HOJA_ORIGEN + " en el consolidado de origen.");
+    }
+
+    let allData = origenSheet.getDataRange().getValues();
+    // La fila de encabezados es la 4 (índice 3), por ende los datos reales inician en la fila 5 (índice 4)
+    let dataRows = allData.slice(4);
+    console.log("Se cargaron " + dataRows.length + " filas del consolidado HNC.");
+
+    // 3. Obtener lista de establecimientos de destino
     let establecimientos = obtenerListaEstablecimientos(ID_HOJA_ESTABLECIMIENTOS);
 
-    for (var i = 1; i < establecimientos.length; i++) {
-        // for (var i = 1; i < 2; i++) {
-        let hnc = SpreadsheetApp.openByUrl(establecimientos[i][5]);
-        let programacion = SpreadsheetApp.openByUrl(establecimientos[i][3]);
-        migrarInformacionDotacion(hnc, programacion);
-        Logger.log(establecimientos[i][0] + " ha sido Migrado!");
+    if (!establecimientos || establecimientos.length < 2) {
+        console.log("No se encontraron establecimientos válidos para procesar.");
+        return;
+    }
+
+    for (let i = 1; i < establecimientos.length; i++) {
+        let nombreEstablecimiento = establecimientos[i][0];
+        let programacionUrl = establecimientos[i][3]; // URL del sheet de destino (programacion)
+        
+        if (!programacionUrl) {
+            console.warn("El establecimiento " + nombreEstablecimiento + " no tiene configurada una URL de destino.");
+            continue;
+        }
+
+        try {
+            let programacion = SpreadsheetApp.openByUrl(programacionUrl);
+            migrarInformacionDotacionConsolidada(nombreEstablecimiento, dataRows, programacion);
+            console.log(nombreEstablecimiento + " ha sido Migrado con éxito!");
+        } catch (e) {
+            console.error("Error al migrar el establecimiento " + nombreEstablecimiento + ": " + e.message);
+        }
     }
 }
 
-function migrarInformacionDotacion(origen, destino) {
-    let datosOrigen;
-    //*COLUMNA ESTAMENTO
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("B7:B199").getValues();
-    // Obtener el mapeo de traducción
-    let traduccion = traduccionEstamentos();
-    // Traducir los valores
-    for (let i = 0; i < datosOrigen.length; i++) {
-        let estamentoOriginal = datosOrigen[i][0];
-        if (traduccion[estamentoOriginal]) {
-            datosOrigen[i][0] = traduccion[estamentoOriginal];
-        }
-        // Si no está en el mapeo, dejar el valor original
+function migrarInformacionDotacionConsolidada(nombreEstablecimiento, dataRows, destino) {
+    let sheetDestino = destino.getSheetByName("DOTACION");
+    if (!sheetDestino) {
+        throw new Error("No se encontró la pestaña 'DOTACION' en el archivo de destino.");
     }
-    destino.getSheetByName("DOTACION").getRange("A3:A195").setValues(datosOrigen);
 
-    //*COLUMNA CARGO
-    destino.getSheetByName("DOTACION").getRange("B3:B195").setValues(datosOrigen);
+    // 1. Filtrar registros del consolidado correspondientes a este centro
+    let rowsFiltradas = dataRows.filter(row => {
+        let estValue = row[2]; // Columna ESTABLECIMIENTO (índice 2)
+        return estValue && estValue.toString().trim().toUpperCase() === nombreEstablecimiento.toString().trim().toUpperCase();
+    });
 
-    //*COLUMNA CATEGORIA
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("A7:A199").getValues();
-    destino.getSheetByName("DOTACION").getRange("C3:C195").setValues(datosOrigen);
+    // 2. Limpieza total de los registros anteriores en la pestaña DOTACION (columnas A a X, desde fila 3)
+    let lastRow = sheetDestino.getLastRow();
+    if (lastRow >= 3) {
+        sheetDestino.getRange(3, 1, lastRow - 2, 24).clearContent();
+    }
 
-    //*COLUMNA NOMBRE FUNCIONARIO
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("C7:C199").getValues();
-    destino.getSheetByName("DOTACION").getRange("E3:E195").setValues(datosOrigen);
+    let numRows = rowsFiltradas.length;
+    if (numRows === 0) {
+        console.log("No se encontraron registros de dotación para: " + nombreEstablecimiento);
+        return;
+    }
 
-    //*COLUMNA HORAS FUNCIONARIO
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("D7:D199").getValues();
-    destino.getSheetByName("DOTACION").getRange("F3:F195").setValues(datosOrigen);
+    // 3. Mapear y preparar datos por bloques
+    let datosA_G = [];
+    let datosV = [];
+    let traduccion = traduccionEstamentos();
 
-    //*COLUMNA DIAS FL
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("F7:F199").getValues();
-    destino.getSheetByName("DOTACION").getRange("H3:H195").setValues(datosOrigen);
+    for (let r = 0; r < numRows; r++) {
+        let sourceRow = rowsFiltradas[r];
+        let cargoOriginal = sourceRow[4]; // Columna CARGO (índice 4)
+        let cargoTraducido = traduccion[cargoOriginal] ? traduccion[cargoOriginal] : cargoOriginal;
 
-    //*COLUMNA DIAS ADM
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("E7:E199").getValues();
-    destino.getSheetByName("DOTACION").getRange("I3:I195").setValues(datosOrigen);
+        // Bloque A-G: ESTAMENTO, CARGO, CAT, CALIDAD, NOMBRE FUNCIONARIO/A, HORAS FUNC, DIAS PROGRAMACION
+        datosA_G.push([
+            cargoTraducido,           // ESTAMENTO (Col A)
+            cargoTraducido,           // CARGO (Col B)
+            sourceRow[3],             // CAT (Col C - CATEGORIA)
+            "DOTACION",               // CALIDAD (Col D - Valor Fijo)
+            sourceRow[6],             // NOMBRE FUNCIONARIO/A (Col E - FUNCIONARIO)
+            sourceRow[5],             // HORAS FUNC (Col F - JORNADA)
+            248                       // DIAS PROGRAMACION (Col G - Valor Fijo)
+        ]);
 
-    //*COLUMNA DIAS CAPACITACION
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("G7:G199").getValues();
-    destino.getSheetByName("DOTACION").getRange("K3:K195").setValues(datosOrigen);
+        // Bloque V: TOTAL HORAS CLINICAS AL AÑO
+        datosV.push([
+            sourceRow[16]             // TOTAL HORAS CLINICAS AL AÑO (Col V - HORAS CLINICAS año)
+        ]);
+    }
 
-    //*COLUMNA HRS SEMANA ALMUERZO (DERECHOS FUNCIONARIOS)
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("N7:N199").getValues();
-    destino.getSheetByName("DOTACION").getRange("P3:P195").setValues(datosOrigen);
-
-    //*COLUMNA HRS SEMANA REUNIONES
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("M7:M199").getValues();
-    destino.getSheetByName("DOTACION").getRange("R3:R195").setValues(datosOrigen);
-
-    //*COLUMNA HRS SEMANA GESTION
-    datosOrigen = origen.getSheetByName("Horas_FUNC").getRange("L7:L199").getValues();
-    destino.getSheetByName("DOTACION").getRange("S3:S195").setValues(datosOrigen);
-
-    //*COLUMNA CALIDAD (Se usa solo en la primera ejecución para llenar la columna con "DOTACION")
-    // let dotacionArray = Array(193)
-    //     .fill()
-    //     .map(() => ["DOTACION"]);
-    // destino.getSheetByName("DOTACION").getRange("D3:D195").setValues(dotacionArray);
+    // 4. Escritura masiva de alto rendimiento
+    sheetDestino.getRange(3, 1, numRows, 7).setValues(datosA_G);
+    sheetDestino.getRange(3, 22, numRows, 1).setValues(datosV);
+    console.log("Migradas exitosamente " + numRows + " filas de dotación para " + nombreEstablecimiento);
 }
 
 function traduccionEstamentos() {
@@ -104,4 +131,47 @@ function traduccionEstamentos() {
         "TONS (HIGIENISTA DENTAL)": "TONS (HIGIENISTA DENTAL)",
     };
     return traduccion;
+}
+
+function validarConsolidadoHNC() {
+    const ID_ORIGEN_CONSOLIDADOR = "1Yc4t7SmTrXuffMsnr5le1a_V7uoBKmVMnw4WWgzv3Cs";
+    const NOMBRE_HOJA_ORIGEN = "CONSO_HNC_HC";
+    
+    let origenSpreadsheet = SpreadsheetApp.openById(ID_ORIGEN_CONSOLIDADOR);
+    let origenSheet = origenSpreadsheet.getSheetByName(NOMBRE_HOJA_ORIGEN);
+    if (!origenSheet) {
+        console.error("No se pudo encontrar la hoja " + NOMBRE_HOJA_ORIGEN);
+        return;
+    }
+    
+    let allData = origenSheet.getDataRange().getValues();
+    let dataRows = allData.slice(4);
+    console.log("--- PRUEBA EN SECO CONSOLIDADO HNC ---");
+    console.log("Total filas de datos leídas: " + dataRows.length);
+
+    // Probar con un establecimiento muestra
+    const centrosMuestra = ["CECOSF CERRO ALEGRE", "CECOSF ISLA NEGRA"];
+    
+    centrosMuestra.forEach(centro => {
+        let rowsFiltradas = dataRows.filter(row => {
+            let estValue = row[2];
+            return estValue && estValue.toString().trim().toUpperCase() === centro.toString().trim().toUpperCase();
+        });
+        
+        console.log("\nEstablecimiento: " + centro);
+        console.log("Registros encontrados: " + rowsFiltradas.length);
+        
+        if (rowsFiltradas.length > 0) {
+            console.log("Primer registro de muestra:");
+            let r = rowsFiltradas[0];
+            console.log(" - ID: " + r[0]);
+            console.log(" - Establecimiento: " + r[2]);
+            console.log(" - Categoría (Copia a CAT Col C): " + r[3]);
+            console.log(" - Cargo (Copia a ESTAMENTO/CARGO Col A/B): " + r[4]);
+            console.log(" - Jornada (Copia a HORAS FUNC Col F): " + r[5]);
+            console.log(" - Funcionario (Copia a NOMBRE Col E): " + r[6]);
+            console.log(" - Horas Clínicas Año (Copia a TOTAL HORAS CLINICAS AL AÑO Col V): " + r[16]);
+        }
+    });
+    console.log("\n--- FIN DE PRUEBA EN SECO ---");
 }
