@@ -16,7 +16,7 @@ function MigrarSoloValores(nuevosNombres) {
 function MigrarValores(origen, destino) {
     let datosOrigen;
     //Parte 1
-    datosOrigen = origen.getSheetByName("AGENDA").getRange("A4:A112").getValues();
+    datosOrigen = origen.getSheetByName("PROG TRAZADORAS 2026").getRange("C10").getValues();
     //console.log(datosOrigen);
-    destino.getSheetByName("AGENDA").getRange("A4:A112").setValues(datosOrigen);
+    destino.getSheetByName("PROG TRAZADORAS 2026").getRange("C10").setValues(datosOrigen);
 }

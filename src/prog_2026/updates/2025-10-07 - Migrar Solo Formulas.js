@@ -15,7 +15,7 @@ function MigrarSoloFormulas(nuevosNombres) {
 
 function migracionFormulaPob(origen, destino) {
     // Copiar el rango completo D77:DV87 de la hoja "PoblaSimpleHom" incluyendo fórmulas
-    copiarFormulaRangoPob(origen, destino, "AGENDA", "B4:Y113", "B4:Y113");
+    copiarFormulaRangoPob(origen, destino, "PROG TRAZADORAS 2026", "K10", "K10");
 }
 
 // 🔹 Función utilitaria que copia solo las fórmulas entre archivos
