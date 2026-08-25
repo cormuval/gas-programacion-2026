@@ -4,6 +4,19 @@ function consolidarDotacion() {
   const ID_DESTINO = "18LBdfGN_I6KqdwRQSzfooXXFz6d_wp7Q-lusKKUVSg0"; // Reemplaza con el ID del archivo donde quieres consolidar
   const NOMBRE_HOJA_DESTINO = "DOTACION"; // Reemplaza con el nombre de tu pestaña de destino
 
+  // Se lee hasta la columna V (22) para poder alcanzar el total de horas clínicas
+  const TOTAL_COLUMNAS_ORIGEN = 22;
+  // Del origen solo se traspasan las columnas A a la F más la columna V
+  const COLUMNAS_BASE = 6;
+  // 1 columna para el nombre del centro + las 6 columnas de la A a la F + la columna V
+  const TOTAL_COLUMNAS_DESTINO = COLUMNAS_BASE + 2;
+
+  // Semanas programables del año: convierte las horas clínicas anuales en semanales
+  const SEMANAS_PROGRAMABLES = 49.6;
+  const DECIMALES_HORAS = 1;
+  const ENCABEZADO_HORAS_ANUALES = "TOTAL HORAS CLINICAS AL AÑO";
+  const INDICE_COLUMNA_V = 21; // Respaldo si el encabezado no se encuentra
+
   // 2. LISTADO DE ESTABLECIMIENTOS PERMITIDOS (Sacados de la imagen)
   const establecimientosFiltrados = [
     "CECOSF JUAN PABLO II",
@@ -30,9 +43,8 @@ function consolidarDotacion() {
   let hojaDestino = ssDestino.getSheetByName(NOMBRE_HOJA_DESTINO);
 
   // Limpiar hoja destino (Asumiendo que la fila 1 tiene los encabezados del consolidado)
-  // Limpiamos 7 columnas (1 para el nombre del centro + 6 columnas de la A a la F)
   if (hojaDestino.getLastRow() > 1) {
-    hojaDestino.getRange(2, 1, hojaDestino.getLastRow(), 7).clearContent();
+    hojaDestino.getRange(2, 1, hojaDestino.getLastRow() - 1, TOTAL_COLUMNAS_DESTINO).clearContent();
   }
 
   let datosConsolidados = [];
@@ -59,16 +71,23 @@ function consolidarDotacion() {
         let ultimaFila = hojaOrigen.getLastRow();
         if (ultimaFila < 2) continue; // Si no hay datos saltamos
 
-        // Traer información desde la fila 2, columna 1 (A) hasta la columna 6 (F)
-        let datosRango = hojaOrigen.getRange(2, 1, ultimaFila - 1, 6).getValues();
+        // Traer información desde la fila 2, columna 1 (A) hasta la columna 22 (V)
+        let datosRango = hojaOrigen.getRange(2, 1, ultimaFila - 1, TOTAL_COLUMNAS_ORIGEN).getValues();
 
         // La primera fila obtenida (índice 0) corresponde a la fila 2 de la hoja (los encabezados)
-        let encabezados = datosRango[0].map(h => h.toString().trim().toUpperCase());
+        let encabezados = datosRango[0].map(h => normalizarEncabezado(h));
         let indiceEstamento = encabezados.indexOf("ESTAMENTO");
 
         if (indiceEstamento === -1) {
           console.log("No se encontró la columna 'ESTAMENTO' en " + nombreCentro);
           continue; // Si no hay columna ESTAMENTO, no podemos filtrar, pasamos al siguiente
+        }
+
+        // Ubicamos la columna de horas anuales por su encabezado; si no aparece usamos la columna V
+        let indiceHorasAnuales = encabezados.indexOf(normalizarEncabezado(ENCABEZADO_HORAS_ANUALES));
+        if (indiceHorasAnuales === -1) {
+          indiceHorasAnuales = INDICE_COLUMNA_V;
+          console.log("No se encontró el encabezado '" + ENCABEZADO_HORAS_ANUALES + "' en " + nombreCentro + ". Se usará la columna V.");
         }
 
         // 4. FILTRAR Y CAPTURAR LOS DATOS
@@ -79,8 +98,11 @@ function consolidarDotacion() {
 
           // Condición: Que la columna ESTAMENTO tenga información
           if (valorEstamento && valorEstamento.toString().trim() !== "") {
-            // Agregamos la fila. Se incluye el nombre del centro en la primera columna
-            datosConsolidados.push([nombreCentro, ...fila]);
+            // Las horas clínicas anuales se expresan en horas clínicas semanales
+            let horasSemanales = convertirHorasAnualesASemanales(fila[indiceHorasAnuales], SEMANAS_PROGRAMABLES, DECIMALES_HORAS);
+
+            // Agregamos la fila: nombre del centro + columnas A:F + horas clínicas semanales
+            datosConsolidados.push([nombreCentro, ...fila.slice(0, COLUMNAS_BASE), horasSemanales]);
           }
         }
         console.log(nombreCentro + " procesado correctamente.");
@@ -92,10 +114,39 @@ function consolidarDotacion() {
 
   // 5. PEGAR LOS DATOS EN EL DESTINO
   if (datosConsolidados.length > 0) {
-    // datosConsolidados[0].length determinará cuántas columnas se pegan (1 del nombre + 6 de A:F = 7 columnas)
+    // datosConsolidados[0].length determinará cuántas columnas se pegan (1 del nombre + 6 de A:F + 1 de la V = 8 columnas)
     hojaDestino.getRange(2, 1, datosConsolidados.length, datosConsolidados[0].length).setValues(datosConsolidados);
     console.log("✅ Consolidación exitosa. Se consolidaron " + datosConsolidados.length + " filas.");
   } else {
     console.log("⚠️ No se encontraron datos que cumplieran las condiciones para consolidar.");
   }
+}
+
+/**
+ * Normaliza un encabezado para poder compararlo: quita espacios sobrantes,
+ * lo pasa a mayúsculas y elimina las tildes y la virgulilla de la Ñ.
+ */
+function normalizarEncabezado(valor) {
+  return valor
+    .toString()
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, " ")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+/**
+ * Convierte un total de horas clínicas anuales en horas clínicas semanales,
+ * redondeadas a la cantidad de decimales indicada.
+ * Si el valor no es numérico se devuelve tal cual vino del origen.
+ */
+function convertirHorasAnualesASemanales(valor, semanasProgramables, decimales) {
+  if (valor === "" || valor === null || valor === undefined) return valor;
+
+  let numero = typeof valor === "number" ? valor : Number(valor.toString().trim().replace(",", "."));
+  if (isNaN(numero)) return valor;
+
+  let factor = Math.pow(10, decimales);
+  return Math.round((numero / semanasProgramables) * factor) / factor;
 }
