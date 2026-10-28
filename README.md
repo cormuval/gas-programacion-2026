@@ -7,7 +7,9 @@ Proyecto de automatización para la gestión de programaciones de Atención Prim
 -   **src/**: Scripts principales organizados por año y tipo
     -   **Prog 2025/**: Scripts para programaciones del año 2025
     -   **Prog 2026/**: Scripts para programaciones del año 2026
+    -   **Prog 2027/**: Scripts para programaciones del año 2027
     -   **Hnc 2026/**: Scripts para las BD de la App de HNC 2026
+    -   **Hnc 2027/**: Scripts para las BD de la App de HNC 2027
 -   **utils/**: Funciones utilitarias reutilizables
 -   **Examples/**: Ejemplos de uso y casos prácticos
 
