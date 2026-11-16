@@ -55,7 +55,7 @@ function migrarInformacionDotacionConsolidada2027(nombreEstablecimiento, dataRow
 
     // 1. Filtrar registros del consolidado correspondientes a este centro
     let rowsFiltradas = dataRows.filter((row) => {
-        let estValue = row[2]; // Columna ESTABLECIMIENTO (índice 2)
+        let estValue = row[1]; // Columna ESTABLECIMIENTO (índice 1, Col B)
         return estValue && estValue.toString().trim().toUpperCase() === nombreEstablecimiento.toString().trim().toUpperCase();
     });
 
@@ -78,23 +78,23 @@ function migrarInformacionDotacionConsolidada2027(nombreEstablecimiento, dataRow
 
     for (let r = 0; r < numRows; r++) {
         let sourceRow = rowsFiltradas[r];
-        let cargoOriginal = sourceRow[4]; // Columna CARGO (índice 4)
+        let cargoOriginal = sourceRow[3]; // Columna CARGO (índice 3, Col D)
         let cargoTraducido = traduccion[cargoOriginal] ? traduccion[cargoOriginal] : cargoOriginal;
 
         // Bloque A-G: ESTAMENTO, CARGO, CAT, CALIDAD, NOMBRE FUNCIONARIO/A, HORAS FUNC, DIAS PROGRAMACION
         datosA_G.push([
             cargoTraducido, // ESTAMENTO (Col A)
             cargoTraducido, // CARGO (Col B)
-            sourceRow[3], // CAT (Col C - CATEGORIA)
+            sourceRow[2], // CAT (Col C - CATEGORIA, índice 2, Col C)
             "DOTACION", // CALIDAD (Col D - Valor Fijo)
-            sourceRow[6], // NOMBRE FUNCIONARIO/A (Col E - FUNCIONARIO)
-            sourceRow[5], // HORAS FUNC (Col F - JORNADA)
+            sourceRow[5], // NOMBRE FUNCIONARIO/A (Col E - FUNCIONARIO, índice 5, Col F)
+            sourceRow[4], // HORAS FUNC (Col F - JORNADA, índice 4, Col E)
             248, // DIAS PROGRAMACION (Col G - Valor Fijo)
         ]);
 
         // Bloque V: TOTAL HORAS CLINICAS AL AÑO
         datosV.push([
-            sourceRow[16], // TOTAL HORAS CLINICAS AL AÑO (Col V - HORAS CLINICAS año)
+            sourceRow[14], // TOTAL HORAS CLINICAS AL AÑO (Col V - HORAS CLINICAS año, índice 14, Col O)
         ]);
     }
 
@@ -113,6 +113,7 @@ function traduccionEstamentos2027() {
         "EDUCADORA DE PARVULOS": "EDUCADORA DE PARVULOS",
         "ENFERMERA(O)": "ENFERMERA/O",
         FONOAUDIOLOGA: "FONOAUDIOLOGO/A",
+        "FONOAUDIOLOGA(O)": "FONOAUDIOLOGO/A",
         "KINESIOLOGA/O": "KINESIOLOGA/O",
         "MATRON/A": "MATRON/A",
         NUTRICIONISTA: "NUTRICIONISTA",
@@ -156,10 +157,11 @@ function validarConsolidadoHNC2027() {
 
     // Probar con un establecimiento muestra
     const centrosMuestra = ["CECOSF CERRO ALEGRE", "CECOSF ISLA NEGRA"];
+    let traduccion = traduccionEstamentos2027();
 
     centrosMuestra.forEach((centro) => {
         let rowsFiltradas = dataRows.filter((row) => {
-            let estValue = row[2];
+            let estValue = row[1];
             return estValue && estValue.toString().trim().toUpperCase() === centro.toString().trim().toUpperCase();
         });
 
@@ -169,13 +171,15 @@ function validarConsolidadoHNC2027() {
         if (rowsFiltradas.length > 0) {
             console.log("Primer registro de muestra:");
             let r = rowsFiltradas[0];
-            console.log(" - ID: " + r[0]);
-            console.log(" - Establecimiento: " + r[2]);
-            console.log(" - Categoría (Copia a CAT Col C): " + r[3]);
-            console.log(" - Cargo (Copia a ESTAMENTO/CARGO Col A/B): " + r[4]);
-            console.log(" - Jornada (Copia a HORAS FUNC Col F): " + r[5]);
-            console.log(" - Funcionario (Copia a NOMBRE Col E): " + r[6]);
-            console.log(" - Horas Clínicas Año (Copia a TOTAL HORAS CLINICAS AL AÑO Col V): " + r[16]);
+            let cargoOriginal = r[3];
+            let cargoTraducido = traduccion[cargoOriginal] ? traduccion[cargoOriginal] : cargoOriginal;
+            console.log(" - Comuna: " + r[0]);
+            console.log(" - Establecimiento: " + r[1]);
+            console.log(" - Categoría (Copia a CAT Col C): " + r[2]);
+            console.log(" - Cargo (Copia a ESTAMENTO/CARGO Col A/B): " + cargoOriginal + " -> " + cargoTraducido);
+            console.log(" - Jornada (Copia a HORAS FUNC Col F): " + r[4]);
+            console.log(" - Funcionario (Copia a NOMBRE Col E): " + r[5]);
+            console.log(" - Horas Clínicas Año (Copia a TOTAL HORAS CLINICAS AL AÑO Col V): " + r[14]);
         }
     });
     console.log("\n--- FIN DE PRUEBA EN SECO ---");
